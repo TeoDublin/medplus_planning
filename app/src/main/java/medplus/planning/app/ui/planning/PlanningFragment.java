@@ -1,15 +1,23 @@
 package medplus.planning.app.ui.planning;
 
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridLayout;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.android.volley.Request;
@@ -19,11 +27,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Iterator;
 
+import medplus.planning.app.R;
 import medplus.planning.app.databinding.FragmentPlanningBinding;
 
 public class PlanningFragment extends Fragment {
@@ -52,7 +62,7 @@ public class PlanningFragment extends Fragment {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        populateTable(response);
+                        populate(response);
                     }
                 },
                 new Response.ErrorListener() {
@@ -66,40 +76,66 @@ public class PlanningFragment extends Fragment {
         requestQueue.add(jsonObjectRequest);
     }
 
-    private void populateTable(JSONObject data) {
-        TableLayout tableLayout = binding.tableLayoutPlanning;
-
+    private void populate(JSONObject data) {
+        LinearLayout container = binding.linearLayout;
         try {
-            Iterator<String> keys = data.keys();
+            JSONArray planningRow = data.getJSONArray("planning_row");
 
-            while (keys.hasNext()) {
-                String key = keys.next();
-                JSONObject item = data.getJSONObject(key);
 
-                int id = item.getInt("id");
-                String start = item.getString("start");
-                String end = item.getString("end");
-                String origin = item.getString("origin");
-                String reason = item.getString("reason");
+            for (int i = 0; i < planningRow.length(); i++) {
+                JSONObject item = planningRow.getJSONObject(i);
+                LinearLayout rowLayout = new LinearLayout(requireContext());
+                rowLayout.setOrientation(LinearLayout.HORIZONTAL);
+                TextView planTextView = createTextView(item.getString("plan"));
 
-                TableRow row = new TableRow(requireContext());
-                row.addView(createTextView(String.valueOf(id)));
-                row.addView(createTextView(start));
-                row.addView(createTextView(end));
-                row.addView(createTextView(origin));
-                row.addView(createTextView(reason));
+                String id = item.getString("id");
+                String[] parts = id.split("_");
+                Drawable background = ContextCompat.getDrawable(requireContext(), R.drawable.planning_item);
+                switch (parts[0]){
+                    case "sbarra":{
+                        background = ContextCompat.getDrawable(requireContext(), R.drawable.planning_item_sbarra);
+                        break;
+                    }
+                    case "seduta":{
+                        background = ContextCompat.getDrawable(requireContext(), R.drawable.planning_item_seduta);
+                        break;
+                    }
+                    case "-":{
+                        background = ContextCompat.getDrawable(requireContext(), R.drawable.planning_item_libero);
 
-                tableLayout.addView(row);
+                        break;
+                    }
+                }
+
+                planTextView.setBackground(background);
+
+                rowLayout.addView(planTextView);
+                container.addView(rowLayout);
             }
         } catch (JSONException e) {
-            Toast.makeText(requireContext(), "Error parsing data", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Error parsing data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
+    private int dp(int px) {
+        return (int) (px * getResources().getDisplayMetrics().density);
+    }
+
     private TextView createTextView(String text) {
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(80)
+        );
+        layoutParams.setMargins(dp(3), dp(3), dp(3), dp(3));
+
         TextView textView = new TextView(requireContext());
         textView.setText(text);
         textView.setPadding(8, 8, 8, 8);
+        textView.setLayoutParams(layoutParams);
+        textView.setGravity(Gravity.CENTER);
+        textView.setPadding(dp(1), dp(8), dp(1), dp(8));
+        textView.setTextSize(18);
+        textView.setTypeface(null, Typeface.BOLD);
+        textView.setTextColor(Color.BLACK);
         return textView;
     }
 

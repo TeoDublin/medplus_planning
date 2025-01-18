@@ -1,25 +1,38 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"> <!-- Use match_parent for the root height -->
 
-    <TableLayout
-        android:id="@+id/tableLayoutPlanning"
+    <!-- Header Section -->
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:stretchColumns="*"
-        android:background="#EFEFEF">
+        android:layout_height="wrap_content">
 
-        <!-- Add header row -->
-        <TableRow>
-            <TextView android:text="ID" android:padding="8dp" android:background="#CCCCCC" />
-            <TextView android:text="start" android:padding="8dp" android:background="#CCCCCC" />
-            <TextView android:text="end" android:padding="8dp" android:background="#CCCCCC" />
-            <TextView android:text="origin" android:padding="8dp" android:background="#CCCCCC" />
-            <TextView android:text="reason" android:padding="8dp" android:background="#CCCCCC" />
-        </TableRow>
-    </TableLayout>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="18/11/2025"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:textColor="@color/blue_200" />
+    </LinearLayout>
 
+    <!-- Scrollable Content Section -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    </ScrollView>
 </LinearLayout>
